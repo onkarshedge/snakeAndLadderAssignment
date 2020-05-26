@@ -17,12 +17,19 @@ public class Board {
         if (nextPosition > BOARD_LIMIT) {
             return currentPosition;
         }
-        Optional<Ladder> optionalLadder = getLadderAt(nextPosition);
-        Optional<Snake> optionalSnake = getSnakeAt(nextPosition);
-        return optionalLadder.map(ladder -> ladder.top)
-                .orElse(
-                        optionalSnake.map(snake -> snake.tail).orElse(nextPosition)
-                );
+
+        while (currentPosition != nextPosition) {
+            currentPosition = nextPosition;
+            Optional<Ladder> optionalLadder = getLadderAt(nextPosition);
+            Optional<Snake> optionalSnake = getSnakeAt(nextPosition);
+
+            if (optionalSnake.isPresent()) {
+                nextPosition = optionalSnake.get().tail;
+            } else if (optionalLadder.isPresent()) {
+                nextPosition = optionalLadder.get().top;
+            }
+        }
+        return nextPosition;
     }
 
     private Optional<Ladder> getLadderAt(int position) {
